@@ -1,5 +1,7 @@
 import numpy as np
 
+EPSILON = 1e-10  # small value to avoid division by zero in cosine similarity
+
 
 class VectorStore:
     def __init__(self) -> None:
@@ -19,7 +21,7 @@ class VectorStore:
         norms = np.linalg.norm(matrix, axis=1)
         # Avoid division by zero
         denom = norms * q_norm
-        denom = np.where(denom == 0, 1e-10, denom)
+        denom = np.where(denom == 0, EPSILON, denom)
         similarities = matrix.dot(q) / denom
         top_indices = np.argsort(similarities)[::-1][:top_k]
         return [(self._texts[i], float(similarities[i])) for i in top_indices]

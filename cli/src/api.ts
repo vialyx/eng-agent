@@ -1,13 +1,15 @@
 import axios, { AxiosInstance } from "axios";
 import { ReasonRequest, ReasonResponse, EmbedRequest, EmbedResponse } from "./types";
 
+const REQUEST_TIMEOUT_MS = 120000; // 2 minutes to allow for long LLM reasoning
+
 export class AgentApiClient {
   private client: AxiosInstance;
 
   constructor(baseUrl: string = "http://localhost:8000") {
     this.client = axios.create({
       baseURL: baseUrl,
-      timeout: 120000,
+      timeout: REQUEST_TIMEOUT_MS,
       headers: { "Content-Type": "application/json" },
     });
   }

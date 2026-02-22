@@ -2,6 +2,9 @@ import * as fs from "fs";
 import * as path from "path";
 import { FileContext, ToolResult } from "./types";
 
+const MAX_CONTENT_LENGTH = 4000; // limit per file to avoid token overflow
+const MAX_SEARCH_RESULTS = 50;
+
 export function readFile(filePath: string): ToolResult {
   try {
     const content = fs.readFileSync(filePath, "utf-8");
@@ -52,8 +55,7 @@ export function collectFiles(dirPath: string, extensions: string[] = [".ts", ".j
       } else if (extensions.some(ext => entry.name.endsWith(ext))) {
         try {
           const content = fs.readFileSync(fullPath, "utf-8");
-          // Limit content to 4000 chars to avoid token overflow
-          results.push({ path: fullPath, content: content.slice(0, 4000) });
+          results.push({ path: fullPath, content: content.slice(0, MAX_CONTENT_LENGTH) });
         } catch {
           // skip unreadable files
         }
@@ -77,7 +79,7 @@ export function searchCode(dirPath: string, query: string): ToolResult {
     });
   }
   const output = matches.length > 0
-    ? matches.slice(0, 50).join("\n")
+    ? matches.slice(0, MAX_SEARCH_RESULTS).join("\n")
     : `No matches found for "${query}"`;
   return { tool_name: "search_code", input: query, output };
 }
